@@ -1,0 +1,16 @@
+# Visual Studio temporary files
+.vs/
+out/
+*.user
+
+# Build results
+Debug/
+Release/
+x64/
+x86/
+
+# Executables
+*.exe
+*.dll
+*.obj
+*.pdb
