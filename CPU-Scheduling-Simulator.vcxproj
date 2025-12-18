@@ -124,6 +124,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CPU-Scheduling-Simulator.cpp" />
+    <ClCompile Include="Scheduler.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Process.h" />
+    <ClInclude Include="Scheduler.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

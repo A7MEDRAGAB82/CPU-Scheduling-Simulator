@@ -4,31 +4,35 @@
 
 using namespace std;
 
+int main() {
+    vector<Process> processes;
 
+    cout << "Please enter the number of processes: ";
+    int numOfProcesses;
+    cin >> numOfProcesses;
 
+    for (int i = 0; i < numOfProcesses; i++) {
+        int pid, at, bt, prio;
+        cout << "Enter PID, ArrivalTime, BurstTime, Priority: ";
+        cin >> pid >> at >> bt >> prio;
 
+        if (bt <= 0) {
+            cout << "Burst time must be positive.\n";
+            i--;
+            continue;
+        }
 
-int main()
-{
-   vector<Process> processes ;
+        // Construct the Process object directly inside the vector
+        processes.emplace_back(pid, at, bt, prio);
+    }
 
-   cout << "Please enter the number of processes: ";
-   int NumOfProcesses = 0;
-   cin >> NumOfProcesses;
-   for (int i = 0;i<NumOfProcesses;i++)
-   {
-       int pid, at, bt, prio;
-       cout << "Enter ProcessID, arrival time, burst time, and priority for the process : ";
-       cin >> pid >> at >> bt >> prio;
-        processes.push_back(Process(pid, at, bt, prio));
-   }
+    cout << "\nProcesses entered:\n";
+    for (const auto& p : processes) {
+        cout << "PID: " << p.pid
+            << ", AT: " << p.arrivalTime
+            << ", BT: " << p.burstTime
+            << ", Priority: " << p.priority << endl;
+    }
 
-   for (auto &i : processes)
-   {
-       cout << "Process ID: " << i.pid << ", Arrival Time: " << i.arrivalTime
-            << ", Burst Time: " << i.burstTime << ", Priority: " << i.priority << endl;
-   }
-
-
-    
+    return 0;
 }
