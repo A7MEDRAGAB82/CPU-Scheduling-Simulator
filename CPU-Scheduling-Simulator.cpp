@@ -8,7 +8,7 @@ using namespace std;
 
 int main() {
     vector<Process> processes;
-
+    int timeQuantum = 0;
     cout << "Please enter the number of processes: ";
     int numOfProcesses;
     cin >> numOfProcesses;
@@ -51,7 +51,9 @@ int main() {
         Priority_NonPreemptive(processes);
         break;
     case 4:
-        RoundRobin(processes);
+        cout << "please enter timeQuantum: ";
+        cin >> timeQuantum;
+        RoundRobin(processes ,timeQuantum);
         break;
     default:
         cout << "Invalid choice!\n";
