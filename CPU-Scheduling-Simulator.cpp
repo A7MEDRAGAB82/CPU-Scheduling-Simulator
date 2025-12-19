@@ -2,6 +2,7 @@
 #include <vector>
 #include "Process.h"
 #include "Scheduler.h"
+#include "Utils.h"
 
 using namespace std;
 
@@ -27,12 +28,14 @@ int main() {
         processes.emplace_back(pid, at, bt, prio);
     }
 
+    sortByArrivalTime(processes);
   
     // Menu for Algorithm Selection 
     int choice = 0;
     cout << "\nChoose Algorithm:\n";
     cout << "1. FCFS\n";
     cout << "2. SJF (Non-Preemptive)\n";
+    cout << "3. Priority (Non-Preemptive)\n";
     cout << "Enter your choice: ";
     cin >> choice;
 
@@ -43,6 +46,8 @@ int main() {
     case 2:
         SJF_NonPreemptive(processes);
         break;
+    case 3:
+        Priority_NonPreemptive(processes);
     default:
         cout << "Invalid choice!\n";
         break;

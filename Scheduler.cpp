@@ -30,14 +30,7 @@ struct PriorityComparator {
 
 void FCFS(vector<Process>& processes)
 {
-    // Sort processes by Arrival Time (FCFS = First Come First Served)
-    // If Arrival Time is the same, sort by PID
-    sort(processes.begin(), processes.end(),
-        [](const Process& a, const Process& b) {
-            if (a.arrivalTime == b.arrivalTime)
-                return a.pid < b.pid;
-            return a.arrivalTime < b.arrivalTime;
-        });
+   
 
     int currentTime = 0; // Tracks the current CPU time during simulation
 
@@ -62,11 +55,7 @@ void FCFS(vector<Process>& processes)
 
 void SJF_NonPreemptive(vector<Process>& processes)
 {
-    // Sort processes by Arrival Time
-    sort(processes.begin(), processes.end(),
-        [](const Process& a, const Process& b) {
-            return a.arrivalTime < b.arrivalTime;
-        });
+    
 
     priority_queue<Process*, vector<Process*>, SJFComparator> availableProcess;
 
@@ -110,6 +99,47 @@ void SJF_NonPreemptive(vector<Process>& processes)
     
 }
 
-void Priority_NonPreemptive(vector<Process>& processes) {
+void Priority_NonPreemptive(vector<Process>& processes)
+{
+   
+    // Use PriorityComparator for the priority queue (min-heap based on priority)
+    priority_queue<Process*, vector<Process*>, PriorityComparator> readyQueue;
 
+    int currentTime = 0;
+    int completed = 0;
+    int i = 0;
+    int n = processes.size();
+
+    // Simulation loop
+    while (completed < n)
+    {
+        // Add all arrived processes to the ready queue
+        while (i < n && processes[i].arrivalTime <= currentTime) {
+            readyQueue.push(&processes[i]);
+            i++;
+        }
+
+        // CPU idle case
+        if (readyQueue.empty()) {
+            currentTime = processes[i].arrivalTime;
+            continue;
+        }
+
+        // Select process with highest priority (lowest priority value)
+        Process* p = readyQueue.top();
+        readyQueue.pop();
+
+        // Execute process (Non-Preemptive)
+        currentTime += p->burstTime;
+
+        // Calculate results
+        p->completionTime = currentTime;
+        p->turnaroundTime = p->completionTime - p->arrivalTime;
+        p->waitingTime = p->turnaroundTime - p->burstTime;
+
+        completed++;
+    }
+
+    // Print results
+    printResults(processes, "Priority Scheduling Result");
 }
