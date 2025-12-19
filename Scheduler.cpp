@@ -141,5 +141,72 @@ void Priority_NonPreemptive(vector<Process>& processes)
     }
 
     // Print results
-    printResults(processes, "Priority Scheduling Result");
+    printResults(processes, "Priority");
+}
+
+void RoundRobin(vector<Process>& processes, int timeQuantum) {
+    int n = processes.size();
+    int currentTime = 0;
+    int completed = 0;
+
+    queue<Process*> readyQueue;
+
+    // Keep track of which processes have arrived
+    vector<bool> inQueue(n, false);
+
+    while (completed < n)
+    {
+        // Add arrived processes to the queue
+        for (int i = 0; i < n; i++) {
+            if (!inQueue[i] && processes[i].arrivalTime <= currentTime) {
+                readyQueue.push(&processes[i]);
+                inQueue[i] = true;
+            }
+        }
+
+        // CPU idle case
+        if (readyQueue.empty()) {
+            // Move currentTime to the arrival time of the next process
+            int nextArrival = INT32_MAX;
+            for (int i = 0; i < n; i++) {
+                if (!inQueue[i] && processes[i].arrivalTime < nextArrival) {
+                    nextArrival = processes[i].arrivalTime;
+                }
+            }
+            currentTime = nextArrival;
+            continue;
+        }
+
+        // Get the first process from the queue
+        Process* p = readyQueue.front();
+        readyQueue.pop();
+
+        // Execute for min(remainingTime, timeQuantum)
+        int execTime = min(p->remainingTime, timeQuantum);
+        p->remainingTime -= execTime;
+        currentTime += execTime;
+
+        // Add newly arrived processes to the queue during this time slice
+        for (int i = 0; i < n; i++) {
+            if (!inQueue[i] && processes[i].arrivalTime <= currentTime) {
+                readyQueue.push(&processes[i]);
+                inQueue[i] = true;
+            }
+        }
+
+        // If process is not finished, push it back to the queue
+        if (p->remainingTime > 0) {
+            readyQueue.push(p);
+        }
+        else {
+            // Process completed
+            p->completionTime = currentTime;
+            p->turnaroundTime = p->completionTime - p->arrivalTime;
+            p->waitingTime = p->turnaroundTime - p->burstTime;
+            completed++;
+        }
+    }
+
+    // Print results
+    printResults(processes, "Round Robin");
 }
