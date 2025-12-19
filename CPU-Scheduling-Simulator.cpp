@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include "Process.h"
+#include "Scheduler.h"
 
 using namespace std;
 
@@ -18,7 +19,7 @@ int main() {
 
         if (bt <= 0) {
             cout << "Burst time must be positive.\n";
-            i--;
+            i--; // repeat input for this process
             continue;
         }
 
@@ -26,13 +27,13 @@ int main() {
         processes.emplace_back(pid, at, bt, prio);
     }
 
-    cout << "\nProcesses entered:\n";
-    for (const auto& p : processes) {
-        cout << "PID: " << p.pid
-            << ", AT: " << p.arrivalTime
-            << ", BT: " << p.burstTime
-            << ", Priority: " << p.priority << endl;
-    }
+    // Call FCFS scheduler after all processes are entered
+    FCFS(processes);
+
+    // Testing tip:
+    // - Run the program
+    // - Input simple known example
+    // - Verify that Waiting Time (WT) and Turnaround Time (TAT) are correct
 
     return 0;
 }

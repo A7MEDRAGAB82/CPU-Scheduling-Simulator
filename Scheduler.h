@@ -5,4 +5,4 @@
 
 using namespace std;
 
-void FCFS(vector<Process> processes);
+void FCFS(vector<Process>& processes);
