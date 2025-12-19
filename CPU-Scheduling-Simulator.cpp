@@ -36,6 +36,7 @@ int main() {
     cout << "1. FCFS\n";
     cout << "2. SJF (Non-Preemptive)\n";
     cout << "3. Priority (Non-Preemptive)\n";
+    cout << "4. RoundRobin\n";
     cout << "Enter your choice: ";
     cin >> choice;
 
@@ -48,6 +49,10 @@ int main() {
         break;
     case 3:
         Priority_NonPreemptive(processes);
+        break;
+    case 4:
+        RoundRobin(processes);
+        break;
     default:
         cout << "Invalid choice!\n";
         break;
