@@ -1,6 +1,32 @@
 #include "Scheduler.h"
 #include <algorithm>
+#include <queue>
 #include <iostream>
+
+// Comparator for priority queue (min-heap based on Burst Time)
+struct SJFComparator {
+    bool operator()(Process* a, Process* b) {
+        if (a->burstTime == b->burstTime)
+            return a->arrivalTime > b->arrivalTime; 
+        return a->burstTime > b->burstTime;
+    }
+};
+
+void printResults(const vector<Process>& processes, const string& title)
+{
+    cout << "\n" << title << " Scheduling Results:\n";
+    cout << "PID\tAT\tBT\tCT\tTAT\tWT\n";
+
+    for (const auto& p : processes) {
+        cout << p.pid << "\t"
+            << p.arrivalTime << "\t"
+            << p.burstTime << "\t"
+            << p.completionTime << "\t"
+            << p.turnaroundTime << "\t"
+            << p.waitingTime << endl;
+    }
+}
+
 
 void FCFS(vector<Process>& processes)
 {
@@ -31,16 +57,55 @@ void FCFS(vector<Process>& processes)
         process.waitingTime = process.turnaroundTime - process.burstTime;
     }
 
-    // Print final scheduling results table
-    cout << "\nFCFS Scheduling Results:\n";
-    cout << "PID\tAT\tBT\tCT\tTAT\tWT\n";
+    printResults(processes, "FCFS");
+}
 
-    for (const auto& p : processes) {
-        cout << p.pid << "\t"
-            << p.arrivalTime << "\t"
-            << p.burstTime << "\t"
-            << p.completionTime << "\t"
-            << p.turnaroundTime << "\t"
-            << p.waitingTime << endl;
+void SJF_NonPreemptive(vector<Process>& processes)
+{
+    // Sort processes by Arrival Time
+    sort(processes.begin(), processes.end(),
+        [](const Process& a, const Process& b) {
+            return a.arrivalTime < b.arrivalTime;
+        });
+
+    priority_queue<Process*, vector<Process*>, SJFComparator> availableProcess;
+
+    int currentTime = 0;
+    int completed = 0;
+    int i = 0;
+    int n = processes.size();
+
+    // Simulation loop
+    while (completed < n)
+    {
+        // Add all arrived processes to the priority queue
+        while (i < n && processes[i].arrivalTime <= currentTime) {
+            availableProcess.push(&processes[i]);
+            i++;
+        }
+
+        // CPU idle case
+        if (availableProcess.empty()) {
+            currentTime = processes[i].arrivalTime;
+            continue;
+        }
+
+        // Select process with minimum Burst Time
+        Process* p = availableProcess.top();
+        availableProcess.pop();
+
+        // Execute process (Non-Preemptive)
+        currentTime += p->burstTime;
+
+        // Calculate results
+        p->completionTime = currentTime;
+        p->turnaroundTime = p->completionTime - p->arrivalTime;
+        p->waitingTime = p->turnaroundTime - p->burstTime;
+
+        completed++;
     }
+
+    printResults(processes, "SJF_NonPreemptive");
+   
+    
 }

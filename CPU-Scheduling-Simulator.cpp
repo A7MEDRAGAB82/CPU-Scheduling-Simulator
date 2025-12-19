@@ -19,7 +19,7 @@ int main() {
 
         if (bt <= 0) {
             cout << "Burst time must be positive.\n";
-            i--; // repeat input for this process
+            i--;
             continue;
         }
 
@@ -27,13 +27,26 @@ int main() {
         processes.emplace_back(pid, at, bt, prio);
     }
 
-    // Call FCFS scheduler after all processes are entered
-    FCFS(processes);
+  
+    // Menu for Algorithm Selection 
+    int choice = 0;
+    cout << "\nChoose Algorithm:\n";
+    cout << "1. FCFS\n";
+    cout << "2. SJF (Non-Preemptive)\n";
+    cout << "Enter your choice: ";
+    cin >> choice;
 
-    // Testing tip:
-    // - Run the program
-    // - Input simple known example
-    // - Verify that Waiting Time (WT) and Turnaround Time (TAT) are correct
+    switch (choice) {
+    case 1:
+        FCFS(processes);
+        break;
+    case 2:
+        SJF_NonPreemptive(processes);
+        break;
+    default:
+        cout << "Invalid choice!\n";
+        break;
+    }
 
     return 0;
 }

@@ -6,3 +6,4 @@
 using namespace std;
 
 void FCFS(vector<Process>& processes);
+void SJF_NonPreemptive(vector<Process>& processes);
