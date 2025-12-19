@@ -12,6 +12,18 @@ struct SJFComparator {
     }
 };
 
+// Min-heap: lower priority value = higher priority
+struct PriorityComparator {
+    bool operator()(Process* a, Process* b) {
+        if (a->priority != b->priority)
+            return a->priority > b->priority;   // smaller value = higher priority
+        if (a->arrivalTime != b->arrivalTime)
+            return a->arrivalTime > b->arrivalTime; // tie-breaker: earlier arrival
+        return a->pid > b->pid; // tie-breaker: smaller PID
+    }
+};
+
+
 void printResults(const vector<Process>& processes, const string& title)
 {
     cout << "\n" << title << " Scheduling Results:\n";
@@ -108,4 +120,8 @@ void SJF_NonPreemptive(vector<Process>& processes)
     printResults(processes, "SJF_NonPreemptive");
    
     
+}
+
+void Priority_NonPreemptive(vector<Process>& processes) {
+
 }
