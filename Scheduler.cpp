@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <queue>
 #include <iostream>
+#include "Utils.h"
 
 // Comparator for priority queue (min-heap based on Burst Time)
 struct SJFComparator {
@@ -24,20 +25,7 @@ struct PriorityComparator {
 };
 
 
-void printResults(const vector<Process>& processes, const string& title)
-{
-    cout << "\n" << title << " Scheduling Results:\n";
-    cout << "PID\tAT\tBT\tCT\tTAT\tWT\n";
 
-    for (const auto& p : processes) {
-        cout << p.pid << "\t"
-            << p.arrivalTime << "\t"
-            << p.burstTime << "\t"
-            << p.completionTime << "\t"
-            << p.turnaroundTime << "\t"
-            << p.waitingTime << endl;
-    }
-}
 
 
 void FCFS(vector<Process>& processes)
