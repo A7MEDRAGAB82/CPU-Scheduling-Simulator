@@ -1,5 +1,11 @@
 #pragma once
 
+enum QueueType {
+    SYSTEM,        // High priority
+    INTERACTIVE,   // Medium priority
+    BATCH          // Low priority
+};
+
 // Represents a process in the CPU scheduling simulation
 // Time is assumed to be discrete (integer time units)
 struct Process {
@@ -14,13 +20,19 @@ struct Process {
     int turnaroundTime;    // completionTime - arrivalTime
     int completionTime;    // time when process finishes execution
 
-    Process(int pid, int at, int bt, int prio)
+    QueueType queueType;
+
+
+    Process(int pid, int at, int bt, int prio, QueueType qt)
         : pid(pid),
         arrivalTime(at),
         burstTime(bt),
         remainingTime(bt),
         priority(prio),
+        queueType(qt),
         waitingTime(0),
         turnaroundTime(0),
-        completionTime(0) {}
+        completionTime(0) {
+    }
+
 };

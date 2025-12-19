@@ -319,3 +319,109 @@ void Priority_Preemptive(vector<Process>& processes) {
 
     printResults(processes, "Priority Preemptive");
 }
+
+void MultiLevelQueue(vector<Process>& processes) {
+    // Ready queues
+    queue<Process*> systemQueue;   // Round Robin
+    priority_queue<Process*, vector<Process*>, PriorityComparator> interactiveQueue;
+    queue<Process*> batchQueue;    // FCFS
+
+    int currentTime = 0;
+    int completed = 0;
+    int n = processes.size();
+    int i = 0;
+
+    const int TIME_QUANTUM = 2; // fixed quantum for SYSTEM queue
+
+    while (completed < n)
+    {
+        // Add arrived processes to their respective queues
+        while (i < n && processes[i].arrivalTime <= currentTime)
+        {
+            if (processes[i].queueType == SYSTEM)
+                systemQueue.push(&processes[i]);
+            else if (processes[i].queueType == INTERACTIVE)
+                interactiveQueue.push(&processes[i]);
+            else
+                batchQueue.push(&processes[i]);
+
+            i++;
+        }
+
+        /* ================= SYSTEM QUEUE (Round Robin) ================= */
+        if (!systemQueue.empty())
+        {
+            Process* p = systemQueue.front();
+            systemQueue.pop();
+
+            int execTime = min(TIME_QUANTUM, p->remainingTime);
+            p->remainingTime -= execTime;
+            currentTime += execTime;
+
+            // Add newly arrived processes during execution
+            while (i < n && processes[i].arrivalTime <= currentTime)
+            {
+                if (processes[i].queueType == SYSTEM)
+                    systemQueue.push(&processes[i]);
+                else if (processes[i].queueType == INTERACTIVE)
+                    interactiveQueue.push(&processes[i]);
+                else
+                    batchQueue.push(&processes[i]);
+                i++;
+            }
+
+            if (p->remainingTime > 0)
+            {
+                systemQueue.push(p); // not finished ? back to queue
+            }
+            else
+            {
+                p->completionTime = currentTime;
+                p->turnaroundTime = p->completionTime - p->arrivalTime;
+                p->waitingTime = p->turnaroundTime - p->burstTime;
+                completed++;
+            }
+        }
+
+        /* ================= INTERACTIVE QUEUE (Priority NP) ================= */
+        else if (!interactiveQueue.empty())
+        {
+            Process* p = interactiveQueue.top();
+            interactiveQueue.pop();
+
+            currentTime += p->burstTime;
+
+            p->completionTime = currentTime;
+            p->turnaroundTime = p->completionTime - p->arrivalTime;
+            p->waitingTime = p->turnaroundTime - p->burstTime;
+
+            completed++;
+        }
+
+        /* ================= BATCH QUEUE (FCFS) ================= */
+        else if (!batchQueue.empty())
+        {
+            Process* p = batchQueue.front();
+            batchQueue.pop();
+
+            if (currentTime < p->arrivalTime)
+                currentTime = p->arrivalTime;
+
+            currentTime += p->burstTime;
+
+            p->completionTime = currentTime;
+            p->turnaroundTime = p->completionTime - p->arrivalTime;
+            p->waitingTime = p->turnaroundTime - p->burstTime;
+
+            completed++;
+        }
+
+        /* ================= CPU IDLE ================= */
+        else
+        {
+            currentTime++;
+        }
+    }
+
+    printResults(processes, "Multi-Level Queue");
+}
