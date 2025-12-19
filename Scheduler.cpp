@@ -262,3 +262,60 @@ void SJF_Preemptive(vector<Process>& processes) {
 
     printResults(processes, "SJF Preemptive (SRTF)");
 }
+
+void Priority_Preemptive(vector<Process>& processes) {
+    int n = processes.size();
+    int completed = 0;
+    int currentTime = 0;
+
+    vector<bool> isCompleted(n, false);
+
+    while (completed < n)
+    {
+        int idx = -1;
+        int highestPriority = INT_MAX;
+
+        // Find process with highest priority (lowest value) that has arrived
+        for (int i = 0; i < n; i++) {
+            if (!isCompleted[i] && processes[i].arrivalTime <= currentTime) {
+                if (processes[i].priority < highestPriority) {
+                    highestPriority = processes[i].priority;
+                    idx = i;
+                }
+                else if (processes[i].priority == highestPriority) {
+                    // tie-breaker: shorter remainingTime
+                    if (processes[i].remainingTime < processes[idx].remainingTime) {
+                        idx = i;
+                    }
+                    else if (processes[i].remainingTime == processes[idx].remainingTime) {
+                        // tie-breaker: earlier arrival
+                        if (processes[i].arrivalTime < processes[idx].arrivalTime) {
+                            idx = i;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (idx == -1) {
+            // CPU idle
+            currentTime++;
+            continue;
+        }
+
+        // Execute for 1 time unit
+        processes[idx].remainingTime--;
+        currentTime++;
+
+        // If process finished
+        if (processes[idx].remainingTime == 0) {
+            processes[idx].completionTime = currentTime;
+            processes[idx].turnaroundTime = processes[idx].completionTime - processes[idx].arrivalTime;
+            processes[idx].waitingTime = processes[idx].turnaroundTime - processes[idx].burstTime;
+            isCompleted[idx] = true;
+            completed++;
+        }
+    }
+
+    printResults(processes, "Priority Preemptive");
+}

@@ -10,4 +10,5 @@ void SJF_NonPreemptive(vector<Process>& processes);
 void Priority_NonPreemptive(vector<Process>& processes);
 void RoundRobin(vector<Process>& processes ,  int timeQuantum);
 void SJF_Preemptive(vector<Process>& processes);
+void Priority_Preemptive(vector<Process>& processes);
 

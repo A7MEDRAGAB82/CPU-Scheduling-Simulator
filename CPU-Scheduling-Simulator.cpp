@@ -38,6 +38,7 @@ int main() {
     cout << "3. Priority (Non-Preemptive)\n";
     cout << "4. RoundRobin\n";
     cout << "5. SJF Preemptive\n";
+    cout << "6. Priority Preemptive\n";
     cout << "Enter your choice: ";
     cin >> choice;
 
@@ -58,6 +59,9 @@ int main() {
         break;
     case 5:
         SJF_Preemptive(processes);
+        break;
+    case 6:
+        Priority_Preemptive(processes);
         break;
     default:
         cout << "Invalid choice!\n";
