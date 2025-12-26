@@ -5,23 +5,31 @@
 #include "Utils.h"
 #include <climits>
 
-// Comparator for priority queue (min-heap based on Burst Time)
+/**
+ * Comparator for SJF (Shortest Job First) priority queue
+ * Creates a min-heap based on burst time
+ * Tie-breaker: earlier arrival time has higher priority
+ */
 struct SJFComparator {
     bool operator()(Process* a, Process* b) {
         if (a->burstTime == b->burstTime)
-            return a->arrivalTime > b->arrivalTime; 
-        return a->burstTime > b->burstTime;
+            return a->arrivalTime > b->arrivalTime; // Earlier arrival wins
+        return a->burstTime > b->burstTime; // Shorter burst time wins
     }
 };
 
-// Min-heap: lower priority value = higher priority
+/**
+ * Comparator for Priority-based scheduling
+ * Creates a min-heap based on priority value (lower value = higher priority)
+ * Tie-breakers: arrival time, then PID
+ */
 struct PriorityComparator {
     bool operator()(Process* a, Process* b) {
         if (a->priority != b->priority)
-            return a->priority > b->priority;   // smaller value = higher priority
+            return a->priority > b->priority;   // Lower priority value = higher priority
         if (a->arrivalTime != b->arrivalTime)
-            return a->arrivalTime > b->arrivalTime; // tie-breaker: earlier arrival
-        return a->pid > b->pid; // tie-breaker: smaller PID
+            return a->arrivalTime > b->arrivalTime; // Tie-breaker: earlier arrival
+        return a->pid > b->pid; // Tie-breaker: smaller PID
     }
 };
 
@@ -29,23 +37,32 @@ struct PriorityComparator {
 
 
 
+/**
+ * First-Come-First-Served (FCFS) Scheduling Algorithm
+ * 
+ * Processes are executed in the order they arrive in the ready queue.
+ * This is the simplest scheduling algorithm - no preemption, no priority.
+ * 
+ * Time Complexity: O(n) where n is the number of processes
+ * Space Complexity: O(1)
+ * 
+ * @param processes Vector of processes to schedule (must be sorted by arrival time)
+ */
 void FCFS(vector<Process>& processes)
 {
-   
-
     int currentTime = 0; // Tracks the current CPU time during simulation
 
-    // Simulate execution of each process
+    // Execute processes in order of arrival
     for (auto& process : processes)
     {
-        // If CPU is idle until the process arrives
+        // If CPU is idle, wait until the process arrives
         if (currentTime < process.arrivalTime)
             currentTime = process.arrivalTime;
 
-        // Execute the process (advance currentTime by Burst Time)
+        // Execute the process completely (advance currentTime by Burst Time)
         currentTime += process.burstTime;
 
-        // Store results for each process
+        // Calculate performance metrics
         process.completionTime = currentTime;
         process.turnaroundTime = process.completionTime - process.arrivalTime;
         process.waitingTime = process.turnaroundTime - process.burstTime;
@@ -54,97 +71,153 @@ void FCFS(vector<Process>& processes)
     printResults(processes, "FCFS");
 }
 
+/**
+ * Shortest Job First (SJF) Non-Preemptive Scheduling Algorithm
+ * 
+ * Selects the process with the shortest burst time from the ready queue.
+ * Once a process starts executing, it runs to completion (non-preemptive).
+ * 
+ * Time Complexity: O(n log n) where n is the number of processes
+ * Space Complexity: O(n) for the priority queue
+ * 
+ * @param processes Vector of processes to schedule (must be sorted by arrival time)
+ */
 void SJF_NonPreemptive(vector<Process>& processes)
 {
-    
-
-    priority_queue<Process*, vector<Process*>, SJFComparator> availableProcess;
+    // Priority queue (min-heap) based on burst time
+    // Shorter burst time = higher priority
+    priority_queue<Process*, vector<Process*>, SJFComparator> readyQueue;
 
     int currentTime = 0;
     int completed = 0;
-    int i = 0;
+    int nextIndex = 0;
     int n = processes.size();
 
-    // Simulation loop
+    // Simulation loop: continue until all processes are completed
     while (completed < n)
     {
-        // Add all arrived processes to the priority queue
-        while (i < n && processes[i].arrivalTime <= currentTime) {
-            availableProcess.push(&processes[i]);
-            i++;
+        // Add all processes that have arrived by currentTime to ready queue
+        while (nextIndex < n && processes[nextIndex].arrivalTime <= currentTime) {
+            readyQueue.push(&processes[nextIndex]);
+            nextIndex++;
         }
 
-        // CPU idle case
-        if (availableProcess.empty()) {
-            currentTime = processes[i].arrivalTime;
+        // CPU idle case: no process is ready
+        if (readyQueue.empty()) {
+            if (nextIndex < n) {
+                // Jump to next arrival time
+                currentTime = processes[nextIndex].arrivalTime;
+            } else {
+                // All processes have arrived but not completed (shouldn't happen)
+                break;
+            }
             continue;
         }
 
-        // Select process with minimum Burst Time
-        Process* p = availableProcess.top();
-        availableProcess.pop();
+        // Select process with shortest burst time
+        Process* selected = readyQueue.top();
+        readyQueue.pop();
 
-        // Execute process (Non-Preemptive)
-        currentTime += p->burstTime;
+        // Execute process completely (non-preemptive)
+        currentTime += selected->burstTime;
 
-        // Calculate results
-        p->completionTime = currentTime;
-        p->turnaroundTime = p->completionTime - p->arrivalTime;
-        p->waitingTime = p->turnaroundTime - p->burstTime;
+        // Calculate performance metrics
+        selected->completionTime = currentTime;
+        selected->turnaroundTime = selected->completionTime - selected->arrivalTime;
+        selected->waitingTime = selected->turnaroundTime - selected->burstTime;
 
         completed++;
+
+        // IMPORTANT: Add any processes that arrived during execution
+        while (nextIndex < n && processes[nextIndex].arrivalTime <= currentTime) {
+            readyQueue.push(&processes[nextIndex]);
+            nextIndex++;
+        }
     }
 
-    printResults(processes, "SJF_NonPreemptive");
-   
-    
+    printResults(processes, "SJF (Non-Preemptive)");
 }
 
+/**
+ * Priority Non-Preemptive Scheduling Algorithm
+ * 
+ * Selects the process with the highest priority (lowest priority value) from the ready queue.
+ * Once a process starts executing, it runs to completion (non-preemptive).
+ * 
+ * Time Complexity: O(n log n) where n is the number of processes
+ * Space Complexity: O(n) for the priority queue
+ * 
+ * @param processes Vector of processes to schedule (must be sorted by arrival time)
+ */
 void Priority_NonPreemptive(vector<Process>& processes)
 {
-   
-    // Use PriorityComparator for the priority queue (min-heap based on priority)
+    // Priority queue (min-heap) based on priority value
+    // Lower priority value = higher priority
     priority_queue<Process*, vector<Process*>, PriorityComparator> readyQueue;
 
     int currentTime = 0;
     int completed = 0;
-    int i = 0;
+    int nextIndex = 0;
     int n = processes.size();
 
-    // Simulation loop
+    // Simulation loop: continue until all processes are completed
     while (completed < n)
     {
-        // Add all arrived processes to the ready queue
-        while (i < n && processes[i].arrivalTime <= currentTime) {
-            readyQueue.push(&processes[i]);
-            i++;
+        // Add all processes that have arrived by currentTime to ready queue
+        while (nextIndex < n && processes[nextIndex].arrivalTime <= currentTime) {
+            readyQueue.push(&processes[nextIndex]);
+            nextIndex++;
         }
 
-        // CPU idle case
+        // CPU idle case: no process is ready
         if (readyQueue.empty()) {
-            currentTime = processes[i].arrivalTime;
+            if (nextIndex < n) {
+                // Jump to next arrival time
+                currentTime = processes[nextIndex].arrivalTime;
+            } else {
+                // All processes have arrived but not completed (shouldn't happen)
+                break;
+            }
             continue;
         }
 
         // Select process with highest priority (lowest priority value)
-        Process* p = readyQueue.top();
+        Process* selected = readyQueue.top();
         readyQueue.pop();
 
-        // Execute process (Non-Preemptive)
-        currentTime += p->burstTime;
+        // Execute process completely (non-preemptive)
+        currentTime += selected->burstTime;
 
-        // Calculate results
-        p->completionTime = currentTime;
-        p->turnaroundTime = p->completionTime - p->arrivalTime;
-        p->waitingTime = p->turnaroundTime - p->burstTime;
+        // Calculate performance metrics
+        selected->completionTime = currentTime;
+        selected->turnaroundTime = selected->completionTime - selected->arrivalTime;
+        selected->waitingTime = selected->turnaroundTime - selected->burstTime;
 
         completed++;
+
+        // IMPORTANT: Add any processes that arrived during execution
+        while (nextIndex < n && processes[nextIndex].arrivalTime <= currentTime) {
+            readyQueue.push(&processes[nextIndex]);
+            nextIndex++;
+        }
     }
 
-    // Print results
-    printResults(processes, "Priority");
+    printResults(processes, "Priority (Non-Preemptive)");
 }
 
+/**
+ * Round Robin (RR) Scheduling Algorithm
+ * 
+ * Each process gets a fixed time quantum. If a process doesn't complete
+ * within its quantum, it's preempted and moved to the end of the queue.
+ * This ensures fair CPU allocation and prevents starvation.
+ * 
+ * Time Complexity: O(n × q) where n is number of processes, q is time quantum
+ * Space Complexity: O(n) for the ready queue
+ * 
+ * @param processes Vector of processes to schedule (must be sorted by arrival time)
+ * @param timeQuantum Fixed time slice allocated to each process
+ */
 void RoundRobin(vector<Process>& processes, int timeQuantum) {
     int n = processes.size();
     int currentTime = 0;
@@ -212,6 +285,18 @@ void RoundRobin(vector<Process>& processes, int timeQuantum) {
     printResults(processes, "Round Robin");
 }
 
+/**
+ * Shortest Job First Preemptive (SRTF - Shortest Remaining Time First) Algorithm
+ * 
+ * Always executes the process with the shortest remaining time.
+ * If a new process arrives with shorter remaining time, current process is preempted.
+ * This is optimal for minimizing average waiting time in preemptive scheduling.
+ * 
+ * Time Complexity: O(n² × max_bt) where n is number of processes, max_bt is max burst time
+ * Space Complexity: O(n)
+ * 
+ * @param processes Vector of processes to schedule (must be sorted by arrival time)
+ */
 void SJF_Preemptive(vector<Process>& processes) {
     int n = processes.size();
     int completed = 0;
@@ -263,6 +348,18 @@ void SJF_Preemptive(vector<Process>& processes) {
     printResults(processes, "SJF Preemptive (SRTF)");
 }
 
+/**
+ * Priority Preemptive Scheduling Algorithm
+ * 
+ * Always executes the process with the highest priority (lowest priority value).
+ * If a new process arrives with higher priority, current process is preempted.
+ * Suitable for real-time systems where priority matters.
+ * 
+ * Time Complexity: O(n² × max_bt) where n is number of processes, max_bt is max burst time
+ * Space Complexity: O(n)
+ * 
+ * @param processes Vector of processes to schedule (must be sorted by arrival time)
+ */
 void Priority_Preemptive(vector<Process>& processes) {
     int n = processes.size();
     int completed = 0;
@@ -320,6 +417,21 @@ void Priority_Preemptive(vector<Process>& processes) {
     printResults(processes, "Priority Preemptive");
 }
 
+/**
+ * Multi-Level Queue Scheduling Algorithm
+ * 
+ * Divides processes into multiple queues based on process type:
+ * - SYSTEM Queue: Round Robin with time quantum = 2 (highest priority)
+ * - INTERACTIVE Queue: Priority Non-Preemptive (medium priority)
+ * - BATCH Queue: FCFS (lowest priority)
+ * 
+ * Queues are served in priority order (SYSTEM > INTERACTIVE > BATCH)
+ * 
+ * Time Complexity: O(n × q) where n is number of processes, q is time quantum
+ * Space Complexity: O(n)
+ * 
+ * @param processes Vector of processes to schedule (must be sorted by arrival time)
+ */
 void MultiLevelQueue(vector<Process>& processes) {
     // Ready queues
     queue<Process*> systemQueue;   // Round Robin
@@ -389,13 +501,27 @@ void MultiLevelQueue(vector<Process>& processes) {
             Process* p = interactiveQueue.top();
             interactiveQueue.pop();
 
-            currentTime += p->burstTime;
+            // Execute process completely (non-preemptive)
+            currentTime += p->remainingTime;
+            p->remainingTime = 0;
 
             p->completionTime = currentTime;
             p->turnaroundTime = p->completionTime - p->arrivalTime;
             p->waitingTime = p->turnaroundTime - p->burstTime;
 
             completed++;
+
+            // Add newly arrived processes during execution
+            while (i < n && processes[i].arrivalTime <= currentTime)
+            {
+                if (processes[i].queueType == SYSTEM)
+                    systemQueue.push(&processes[i]);
+                else if (processes[i].queueType == INTERACTIVE)
+                    interactiveQueue.push(&processes[i]);
+                else
+                    batchQueue.push(&processes[i]);
+                i++;
+            }
         }
 
         /* ================= BATCH QUEUE (FCFS) ================= */
@@ -404,22 +530,43 @@ void MultiLevelQueue(vector<Process>& processes) {
             Process* p = batchQueue.front();
             batchQueue.pop();
 
+            // Wait if process hasn't arrived yet
             if (currentTime < p->arrivalTime)
                 currentTime = p->arrivalTime;
 
-            currentTime += p->burstTime;
+            // Execute process completely
+            currentTime += p->remainingTime;
+            p->remainingTime = 0;
 
             p->completionTime = currentTime;
             p->turnaroundTime = p->completionTime - p->arrivalTime;
             p->waitingTime = p->turnaroundTime - p->burstTime;
 
             completed++;
+
+            // Add newly arrived processes during execution
+            while (i < n && processes[i].arrivalTime <= currentTime)
+            {
+                if (processes[i].queueType == SYSTEM)
+                    systemQueue.push(&processes[i]);
+                else if (processes[i].queueType == INTERACTIVE)
+                    interactiveQueue.push(&processes[i]);
+                else
+                    batchQueue.push(&processes[i]);
+                i++;
+            }
         }
 
         /* ================= CPU IDLE ================= */
         else
         {
-            currentTime++;
+            // No process in any queue - jump to next arrival time
+            if (i < n) {
+                currentTime = processes[i].arrivalTime;
+            } else {
+                // All processes have arrived but not completed (shouldn't happen)
+                currentTime++;
+            }
         }
     }
 
