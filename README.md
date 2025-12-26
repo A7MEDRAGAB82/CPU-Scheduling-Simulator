@@ -1,12 +1,6 @@
-# 🖥️ CPU Scheduling Simulator
-
-[![C++](https://img.shields.io/badge/C++-17-blue.svg)](https://en.cppreference.com/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)]()
+# CPU Scheduling Simulator
 
 A comprehensive CPU scheduling algorithms simulator implemented in C++. This project demonstrates and compares various CPU scheduling algorithms used in operating systems, providing detailed performance metrics for each algorithm.
-
-> **Perfect for**: Operating Systems students, developers learning CPU scheduling, and anyone interested in understanding how processes are scheduled in modern operating systems.
 
 ## 📋 Table of Contents
 
@@ -242,19 +236,17 @@ Where:
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions are welcome! Please feel free to submit a Pull Request. Areas for improvement:
 
-**Areas for improvement:**
 - Additional scheduling algorithms (e.g., Multilevel Feedback Queue)
 - Graphical visualization of scheduling timeline
 - Export results to CSV/JSON
-- Unit tests and test coverage
+- Unit tests
 - Performance analysis tools
-- Better error handling and input validation
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is created for educational purposes as part of an Operating Systems course.
 
 ## 👨‍💻 Author
 
@@ -264,22 +256,7 @@ Developed as part of the Operating Systems course project.
 
 - Operating Systems concepts and scheduling algorithms
 - CPU scheduling theory and implementations
-- The open-source community for inspiration and feedback
-
-## 📚 Learning Resources
-
-This project is excellent for learning:
-- **CPU Scheduling Concepts**: Understand how operating systems manage process execution
-- **Algorithm Implementation**: See real implementations of classic algorithms
-- **Data Structures**: Priority queues, regular queues, and their applications
-- **C++ Programming**: Modern C++ features and best practices
 
 ---
 
 **Note**: This simulator is designed for educational purposes to understand CPU scheduling algorithms. For production use, consider additional factors like I/O operations, context switching overhead, and system-specific optimizations.
-
-## ⭐ Show Your Support
-
-If you find this project helpful, please consider giving it a star! ⭐
-
-
