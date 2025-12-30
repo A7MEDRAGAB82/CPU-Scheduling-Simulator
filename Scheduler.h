@@ -3,14 +3,12 @@
 #include "Process.h"
 #include <vector>
 
-using namespace std;
-
-void FCFS(vector<Process>& processes);
-void SJF_NonPreemptive(vector<Process>& processes);
-void Priority_NonPreemptive(vector<Process>& processes);
-void RoundRobin(vector<Process>& processes ,  int timeQuantum);
-void SJF_Preemptive(vector<Process>& processes);
-void Priority_Preemptive(vector<Process>& processes);
-void MultiLevelQueue(vector<Process>& processes);
+void FCFS(std::vector<Process>& processes);
+void SJF_NonPreemptive(std::vector<Process>& processes);
+void Priority_NonPreemptive(std::vector<Process>& processes);
+void RoundRobin(std::vector<Process>& processes ,  int timeQuantum);
+void SJF_Preemptive(std::vector<Process>& processes);
+void Priority_Preemptive(std::vector<Process>& processes);
+void MultiLevelQueue(std::vector<Process>& processes);
 
 

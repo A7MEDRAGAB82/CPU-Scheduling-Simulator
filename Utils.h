@@ -3,10 +3,8 @@
 #include <string>
 #include "Process.h"
 
-using namespace std;
 
+void sortByArrivalTime(std::vector<Process>& processes);
 
-void sortByArrivalTime(vector<Process>& processes);
-
-void printResults(const vector<Process>& processes, const string& title);
+void printResults(const std::vector<Process>& processes, const std::string& title);
 

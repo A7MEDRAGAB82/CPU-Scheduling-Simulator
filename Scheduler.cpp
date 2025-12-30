@@ -5,6 +5,8 @@
 #include "Utils.h"
 #include <climits>
 
+using namespace std;
+
 /**
  * Comparator for SJF (Shortest Job First) priority queue
  * Creates a min-heap based on burst time
@@ -241,7 +243,7 @@ void RoundRobin(vector<Process>& processes, int timeQuantum) {
         // CPU idle case
         if (readyQueue.empty()) {
             // Move currentTime to the arrival time of the next process
-            int nextArrival = INT32_MAX;
+            int nextArrival = INT_MAX;
             for (int i = 0; i < n; i++) {
                 if (!inQueue[i] && processes[i].arrivalTime < nextArrival) {
                     nextArrival = processes[i].arrivalTime;
